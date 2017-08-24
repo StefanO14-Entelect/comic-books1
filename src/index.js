@@ -178,13 +178,7 @@ function IssueSummary(props) {
 
 
 function loadIssues() {
-    axios.get(server+"/api/Issues")
-    .then(function (response) {
-        console.log("Response:", response);
-    })
-    .catch(function (error) {
-        console.log("Error: ", error);
-    })
+
 }
 
 
