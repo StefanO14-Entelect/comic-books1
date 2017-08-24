@@ -3,8 +3,10 @@ import ReactDOM from 'react-dom';
 import Button from 'react-toolbox/lib/button/Button';
 import Card from 'react-toolbox/lib/card/Card';
 import CardTitle from 'react-toolbox/lib/card/CardTitle';
+import axios from 'axios';
+import Suppliers from '../Suppliers'
 
-const server="http://frontendshowcase.azurewebsites.net:80/api";
+const server="http://frontendshowcase.azurewebsites.net:80";
 
 function Supplier(props) {
     return ( 
@@ -44,14 +46,25 @@ function SupplierSummary(props) {
             </td>
             <td>
                 <Button label="Delete" onClick={props.deleteSupplier}/>
-                Delete
-                
-                <button onClick={props.viewSupplier}>
-                Load
-                </button>
+                <Button label="Load" onClick={props.viewSupplier}/>
             </td>
         </tr>
     )
+}
+
+function loadSuppliers() {
+    let suppliers = null;
+
+    axios.get(server+"/api/Suppliers")
+    .then(function (response) {
+        console.log("Response:", response);
+        suppliers = response["data"];
+        return suppliers;
+    })
+    .catch(function (error) {
+        console.log("Error: ", error);
+        return null;
+    })
 }
 
 function loadMockSuppliers() {
@@ -83,25 +96,27 @@ function loadMockSuppliers() {
     ];
 }
 
-function Suppliers() {
+/*function Suppliers() {
     // TODO: Get suppliers from the API
-    let suppliers = loadMockSuppliers();
-
+    let suppliers = null;
+    loadSuppliers();
+    
     let supplierSummaries = [];
-    for (const supplier of suppliers) {
-        supplierSummaries.push(SupplierSummary(supplier));
+    if (suppliers) {
+        for (const supplier of suppliers) {
+            supplierSummaries.push(SupplierSummary(supplier));
+        }
     }
-
-        return (
-            <div>
-                <button>Add</button>
-                <h1>Suppliers</h1>
-                <table>
-                    {supplierSummaries}
-                </table>
-            </div>
-        )
-}
+            return (
+                <div>
+                    <button>Add</button>
+                    <h1>Suppliers</h1>
+                    <table>
+                        {supplierSummaries}
+                    </table>
+                </div>
+            )
+}*/
 
 
 
@@ -175,7 +190,6 @@ function IssueSummary(props) {
         </tr>
     );
 }
-
 
 function loadIssues() {
 
@@ -257,10 +271,8 @@ function loadMockIssues() {
 }
 
 function Issues() {
-    // TODO: Get issues from the API
-    let apiIssues = loadIssues();
-    let issues = loadMockIssues();
-
+    let issues = loadIssues();
+    
     let issueSummaries = [];
     for (const issue of issues) {
         issueSummaries.push(IssueSummary(issue));
@@ -280,6 +292,6 @@ function Issues() {
 }
 
 ReactDOM.render(
-    <Issues />,
+    <Suppliers />,
     document.getElementById('root')
 );
