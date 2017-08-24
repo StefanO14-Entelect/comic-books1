@@ -1,5 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import Button from 'react-toolbox/lib/button/Button';
+import Card from 'react-toolbox/lib/card/Card';
+import CardTitle from 'react-toolbox/lib/card/CardTitle';
+
+const server="http://frontendshowcase.azurewebsites.net:80/api";
 
 function Supplier(props) {
     return ( 
@@ -38,9 +43,9 @@ function SupplierSummary(props) {
                 {props.reference}
             </td>
             <td>
-                <button onClick={props.deleteSupplier}>
+                <Button label="Delete" onClick={props.deleteSupplier}/>
                 Delete
-                </button>
+                
                 <button onClick={props.viewSupplier}>
                 Load
                 </button>
@@ -52,25 +57,25 @@ function SupplierSummary(props) {
 function loadMockSuppliers() {
     return [
         {
-            "id": 25,
+            "key": 25,
             "name": "_WubaLubaDubDub",
             "city": "_WubaLubaDubDub",
             "reference": "_WubaLubaDubDub"
           },
           {
-            "id": 60,
+            "key": 60,
             "name": "3",
             "city": "4",
             "reference": "5"
           },
           {
-            "id": 2,
+            "key": 2,
             "name": "Cipquestollor WorldWide ",
             "city": "Fresno",
             "reference": "IOYV264X9WTM2P9"
           },
           {
-            "id": 23,
+            "key": 23,
             "name": "Emcadefentor Holdings ",
             "city": "New York",
             "reference": "PJMKC95WY0ZOG4K"
@@ -79,7 +84,6 @@ function loadMockSuppliers() {
 }
 
 function Suppliers() {
-
     // TODO: Get suppliers from the API
     let suppliers = loadMockSuppliers();
 
@@ -165,21 +169,29 @@ function IssueSummary(props) {
                 {props.publicationDate}
             </td>
             <td>
-                <button onClick={props.deleteIssue}>
-                Delete
-                </button>
-                <button onClick={props.loadIssue}>
-                Load
-                </button>
+                <Button label="Delete" onClick={props.deleteIssue}/>
+                <Button label="Load" onClick={props.loadIssue}/>
             </td>
         </tr>
     );
 }
 
+
+function loadIssues() {
+    axios.get(server+"/api/Issues")
+    .then(function (response) {
+        console.log("Response:", response);
+    })
+    .catch(function (error) {
+        console.log("Error: ", error);
+    })
+}
+
+
 function loadMockIssues() {
     return [
         {
-            "id": 55529,
+            "key": 55529,
             "title": "INVINCIBLE IRON MAN (2015) #8",
             "description": "“THE WAR MACHINES” PART 3! Spider-Man, War Machine and Iron Man team up to stop a brand new threat to the Marvel Universe… like only they can. All this plus more hints to next summer’s insane Marvel blockbuster event.",
             "seriesNumber": -1,
@@ -202,7 +214,7 @@ function loadMockIssues() {
             ]
           },
           {
-            "id": 56912,
+            "key": 56912,
             "title": "Hercules (2015) #6",
             "description": "The newborn gods of the Uprising Storm have power over the world, and are about to destroy you all. Unless you’re Hercules, of course, in which case you’re going to fight back. You are going to gather a few old friends, gather your trusted weapons, channel the courage that once made you famous, and give the newborn gods a fight they will NEVER forget.",
             "seriesNumber": -1,
@@ -225,7 +237,7 @@ function loadMockIssues() {
             ]
           },
           {
-            "id": 58746,
+            "key": 58746,
             "title": "Marvel Universe Avengers Assemble: Civil War (2016) #2",
             "description": "SECRETS THREATEN TO DESTROY THE AVENGERS! Find out the secret Iron Man has kept from the team…and how it will change the Avengers’ future! Captain America takes a stand against Iron Man! It’s time: whose side are you on?",
             "seriesNumber": -1,
@@ -251,8 +263,8 @@ function loadMockIssues() {
 }
 
 function Issues() {
-
     // TODO: Get issues from the API
+    let apiIssues = loadIssues();
     let issues = loadMockIssues();
 
     let issueSummaries = [];
@@ -261,18 +273,19 @@ function Issues() {
     }
 
     return (
-        <div>
-            <button>Add</button>
-            <h1>Issues</h1>
+        <Card style={{width: '750px'}} fxFlex="auto">
+            <CardTitle title="Issues"/>
+            <Button label="Add"/>
             <table>
+                <tbody>
                 {issueSummaries}
+                </tbody>
             </table>
-        </div>
+        </Card>
     );
 }
 
 ReactDOM.render(
-    // <Suppliers />,
     <Issues />,
     document.getElementById('root')
 );
