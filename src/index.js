@@ -4,9 +4,112 @@ import Button from 'react-toolbox/lib/button/Button';
 import Card from 'react-toolbox/lib/card/Card';
 import CardTitle from 'react-toolbox/lib/card/CardTitle';
 import axios from 'axios';
-import Suppliers from '../Suppliers'
+// import Suppliers from 'Suppliers.js'
 
 const server="http://frontendshowcase.azurewebsites.net:80";
+
+export class OuterView extends React.Component {
+    constructor(props){
+        super(props);
+
+        this.state= {
+            currentView: <Issues/>
+        }
+
+        // this.state = this.state.bind(this);
+    }
+
+    render() { 
+        const {currentView} = this.state;
+    let view= 
+    <div>
+        <Button  label="Issues" onClick={this.viewIssues}/>
+        <Button  label="Suppliers" onClick={this.viewSuppliers}/>
+        {currentView}
+    </div>;
+        
+        return view;
+    }
+
+    viewIssues(){
+        this.setState({
+            currentView: <Issues/>
+        }.bind(this))
+    }
+
+    viewSuppliers(){
+        this.setState({
+            currentView: <Suppliers/>
+        }.bind(this))
+    }
+}
+
+export class Suppliers extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            suppliers: []
+        }
+    }
+
+    componentDidMount(){
+        this.loadSuppliers();
+    }
+
+    render() {
+        const {suppliers} = this.state;
+        let supplierSummaries = [];
+
+        if (suppliers) {
+            for (const supplier of suppliers) {
+                supplierSummaries.push(this.supplierSummary(supplier));
+            }
+        }
+
+        return (
+            <div>
+                <button>Add</button>
+                <h1>Suppliers</h1>
+                <table>
+                    {supplierSummaries}
+                </table>
+            </div>
+        );
+    }
+
+    loadSuppliers() {
+        axios.get(server+"/api/Suppliers")
+        .then(function (response) {
+            const suppliersIN = response["data"];
+            
+            this.setState({
+                suppliers: suppliersIN
+            });
+            return;
+        }.bind(this))
+        .catch(function (error) {
+            console.log("Error: ", error);
+        })
+    }
+
+    supplierSummary(props) {
+        return (
+            <tr>
+                <td>
+                    {props.name}
+                </td>
+                <td>
+                    {props.reference}
+                </td>
+                <td>
+                    <Button label="Delete" onClick={props.deleteSupplier}/>
+                    <Button label="Load" onClick={props.viewSupplier}/>
+                </td>
+            </tr>
+        )
+    }
+}
 
 function Supplier(props) {
     return ( 
@@ -33,38 +136,6 @@ function Supplier(props) {
                 </button>
             </div>  
     );
-}
-
-function SupplierSummary(props) {
-    return (
-        <tr>
-            <td>
-                {props.name}
-            </td>
-            <td>
-                {props.reference}
-            </td>
-            <td>
-                <Button label="Delete" onClick={props.deleteSupplier}/>
-                <Button label="Load" onClick={props.viewSupplier}/>
-            </td>
-        </tr>
-    )
-}
-
-function loadSuppliers() {
-    let suppliers = null;
-
-    axios.get(server+"/api/Suppliers")
-    .then(function (response) {
-        console.log("Response:", response);
-        suppliers = response["data"];
-        return suppliers;
-    })
-    .catch(function (error) {
-        console.log("Error: ", error);
-        return null;
-    })
 }
 
 function loadMockSuppliers() {
@@ -96,28 +167,72 @@ function loadMockSuppliers() {
     ];
 }
 
-/*function Suppliers() {
-    // TODO: Get suppliers from the API
-    let suppliers = null;
-    loadSuppliers();
-    
-    let supplierSummaries = [];
-    if (suppliers) {
-        for (const supplier of suppliers) {
-            supplierSummaries.push(SupplierSummary(supplier));
+export class Issues extends React.Component{
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            issues: []
         }
     }
-            return (
-                <div>
-                    <button>Add</button>
-                    <h1>Suppliers</h1>
-                    <table>
-                        {supplierSummaries}
-                    </table>
-                </div>
-            )
-}*/
 
+    componentDidMount(){
+        this.loadIssues();
+    }
+
+    loadIssues() {
+        axios.get(server+"/api/Issues")
+        .then(function(response){
+            const issuesIN= response["data"];
+            
+            this.setState({
+                issues: issuesIN
+            })
+            return;
+        }.bind(this))
+        .catch(function(error){
+            console.log("Error:", error);
+        })
+    }  
+
+    render(){
+        let {issues} = this.state;
+        
+        let issueSummaries = [];
+        for (const issue of issues) {
+            issueSummaries.push(this.issueSummary(issue));
+        }
+    
+        return (
+            <Card style={{width: '750px'}} fxFlex="auto">
+                <CardTitle title="Issues"/>
+                <Button label="Add"/>
+                <table>
+                    <tbody>
+                    {issueSummaries}
+                    </tbody>
+                </table>
+            </Card>
+        );
+    }
+
+    issueSummary(props) {
+        return (
+            <tr>
+                <td>
+                    {props.title}
+                </td>
+                <td>
+                    {props.publicationDate}
+                </td>
+                <td>
+                    <Button label="Delete" onClick={props.deleteIssue}/>
+                    <Button label="Load" onClick={props.loadIssue}/>
+                </td>
+            </tr>
+        );
+    }
+}
 
 
 function Issue(props) {
@@ -173,28 +288,6 @@ function Issue(props) {
     </div>
     );
 }
-
-function IssueSummary(props) {
-    return (
-        <tr>
-            <td>
-                {props.title}
-            </td>
-            <td>
-                {props.publicationDate}
-            </td>
-            <td>
-                <Button label="Delete" onClick={props.deleteIssue}/>
-                <Button label="Load" onClick={props.loadIssue}/>
-            </td>
-        </tr>
-    );
-}
-
-function loadIssues() {
-
-}
-
 
 function loadMockIssues() {
     return [
@@ -270,28 +363,7 @@ function loadMockIssues() {
     ];
 }
 
-function Issues() {
-    let issues = loadIssues();
-    
-    let issueSummaries = [];
-    for (const issue of issues) {
-        issueSummaries.push(IssueSummary(issue));
-    }
-
-    return (
-        <Card style={{width: '750px'}} fxFlex="auto">
-            <CardTitle title="Issues"/>
-            <Button label="Add"/>
-            <table>
-                <tbody>
-                {issueSummaries}
-                </tbody>
-            </table>
-        </Card>
-    );
-}
-
 ReactDOM.render(
-    <Suppliers />,
+    <OuterView />,
     document.getElementById('root')
 );
