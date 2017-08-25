@@ -4,9 +4,46 @@ import Button from 'react-toolbox/lib/button/Button';
 import Card from 'react-toolbox/lib/card/Card';
 import CardTitle from 'react-toolbox/lib/card/CardTitle';
 import axios from 'axios';
+import autoBind from 'react-autobind';
+import {BrowserRouter, Switch, Route} from 'react-router-dom';
+import { Link } from 'react-router-dom';
+
 // import Suppliers from 'Suppliers.js'
 
 const server="http://frontendshowcase.azurewebsites.net:80";
+
+const Header = () => (
+    <header>
+        <nav>
+            <ul>
+                <li><Link to='/Suppliers'>Suppliers</Link></li>
+                <li><Link to='/Issues'>Issues</Link></li>
+            </ul>
+        </nav>
+    </header>
+)
+
+const Main = () => (
+    <main>
+        <Switch>
+            <Route exact path='/' component={OuterView}/>
+            <Route path='/Suppliers' component={Suppliers}/> 
+            <Route path='/Issues' component={Issues}/>
+        </Switch>
+    </main>
+)
+
+/*class App extends React.Component {
+    render() {
+        return (
+            <BrowserRouter history={hashHistory}>
+                <Route path='/' Component={OuterView}/>
+                <Route path='/Suppliers' Component={Suppliers}/>
+                <Route path='/Issues' Component={Issues}/>
+            </Router>
+        )
+    }
+}*/
 
 export class OuterView extends React.Component {
     constructor(props){
@@ -16,31 +53,17 @@ export class OuterView extends React.Component {
             currentView: <Issues/>
         }
 
-        // this.state = this.state.bind(this);
+        autoBind(this);
     }
 
     render() { 
         const {currentView} = this.state;
-    let view= 
-    <div>
-        <Button  label="Issues" onClick={this.viewIssues}/>
-        <Button  label="Suppliers" onClick={this.viewSuppliers}/>
-        {currentView}
-    </div>;
-        
+    let view=
+    <div> 
+        <Header />
+        <Main />
+    </div>
         return view;
-    }
-
-    viewIssues(){
-        this.setState({
-            currentView: <Issues/>
-        }.bind(this))
-    }
-
-    viewSuppliers(){
-        this.setState({
-            currentView: <Suppliers/>
-        }.bind(this))
     }
 }
 
@@ -363,7 +386,10 @@ function loadMockIssues() {
     ];
 }
 
-ReactDOM.render(
-    <OuterView />,
+ReactDOM.render((
+    <BrowserRouter>
+        <OuterView/>
+    </BrowserRouter>
+),
     document.getElementById('root')
 );
