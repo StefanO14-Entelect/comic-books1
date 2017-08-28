@@ -65,14 +65,15 @@ export class OuterView extends React.Component {
 }
 
 export class Suppliers extends React.Component {
-    indivSupplier = null;
-
+    
     constructor(props) {
         super(props);
         autoBind(this);
 
         this.state = {
-            suppliers: []
+            suppliers: [],
+            selectedSupplier: null,
+            type: null
         }
     }
 
@@ -83,8 +84,6 @@ export class Suppliers extends React.Component {
     render(props) {
         const {suppliers} = this.state;
         let supplierSummaries = [];
-        let specificSupplier = this.props.match.params;
-        console.log("Specific props: ", specificSupplier);
 
         if (suppliers) {
             for (const supplier of suppliers) {
@@ -108,7 +107,7 @@ export class Suppliers extends React.Component {
                             </table>
                     </Flexbox>
                     <Flexbox flex={2}>
-                        <Supplier supplier={this.state.supplier}/>
+                        <Supplier supplier={this.state.selectedSupplier}/>
                     </Flexbox>
                 </Flexbox>
             </Flexbox>
@@ -140,27 +139,48 @@ export class Suppliers extends React.Component {
                     {props.reference}
                 </td>
                 <td>
-                    <Button label="Delete" onClick={props.deleteSupplier}/>
-                    <Button label="Load" onClick={props.viewSupplier}/>
+                    <Button label="Delete" onClick={() => this.deleteIndividualSupplier(props.id)}/>
+                    <Button label="Load" onClick={() => this.viewIndividualSupplier(props.id)}/>
                 </td>
             </tr>
         )
     }
 
     addIndividualSupplier() {
-        this.indivSupplier = {Name: null, City: null, Reference: null};
-        this.setState({supplier: this.indivSupplier});
+        console.log("Selected Supplier in state: ", this.state.selectedSupplier)
     }
 
-    viewIndividualSupplier() {
-        console.log("Views individual supplier!");
+    deleteIndividualSupplier(id) {
+        console.log("Deletes individual supplier! ID: ");
+    }
+
+    viewIndividualSupplier(id) {
+        axios.get(server+"/api/Suppliers/"+id)
+        .then(function (response) {
+            const id = response["data"]["id"];
+            const name = response["data"]["name"];
+            const city = response["data"]["city"];
+            const reference = response["data"]["reference"]
+            
+            this.setState({
+                selectedSupplier: {
+                    id: id,
+                    name: name,
+                    city: city,
+                    reference: reference
+                }
+            });
+
+
+            return;
+        }.bind(this))
+        .catch(function (error) {
+            console.log("Error: ", error);
+        })
     }
 }
 
 function Supplier(props) {
-
-    console.log("Supplier Props:", props);
-
     if (props.supplier == null) {
         return null;
     } else {
@@ -172,15 +192,15 @@ function Supplier(props) {
                 <table>
                     <tr>
                         <td><b>Name</b></td>
-                        <td><Input type='text' label='Name' name='name' value={props.supplier.Name}/></td>
+                        <td><Input type='text' name='name' value={props.supplier.name}/></td>
                     </tr>
                     <tr>
                         <td><b>City</b></td>
-                        <td><Input type='text' label='City' name='city' value={props.supplier.City}/></td>
+                        <td><Input type='text' name='city' value={props.supplier.city}/></td>
                     </tr>
                     <tr>
                         <td><b>Reference</b></td>
-                        <td><Input type='text' label='Reference' name='reference' value={props.supplier.Reference}/></td>
+                        <td><Input type='text' name='reference' value={props.supplier.reference}/></td>
                     </tr>
                 </table>
                 <button className="supplier" onClick={props.onClick}>
