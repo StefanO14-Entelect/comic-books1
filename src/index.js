@@ -7,7 +7,8 @@ import axios from 'axios';
 import autoBind from 'react-autobind';
 import {BrowserRouter, Switch, Route} from 'react-router-dom';
 import { Link } from 'react-router-dom';
-
+import Input from 'react-toolbox/lib/input';
+import Flexbox from 'flexbox-react';
 // import Suppliers from 'Suppliers.js'
 
 const server="http://frontendshowcase.azurewebsites.net:80";
@@ -26,38 +27,34 @@ const Header = () => (
 const Main = () => (
     <main>
         <Switch>
-            <Route exact path='/' component={OuterView}/>
-            <Route path='/Suppliers' component={Suppliers}/> 
+            <Route exact path='/' component={Home}/>
+            <Route path='/Suppliers' component={Suppliers}/>
+            <Route path='/Suppliers:number' component={Suppliers}/>
             <Route path='/Issues' component={Issues}/>
         </Switch>
     </main>
 )
 
-/*class App extends React.Component {
+export class Home extends React.Component {
+    constructor(props){
+        super(props);
+        autoBind(this);
+    }
+
     render() {
         return (
-            <BrowserRouter history={hashHistory}>
-                <Route path='/' Component={OuterView}/>
-                <Route path='/Suppliers' Component={Suppliers}/>
-                <Route path='/Issues' Component={Issues}/>
-            </Router>
-        )
+            <h>Welcome!</h>
+        );
     }
-}*/
+}
 
 export class OuterView extends React.Component {
     constructor(props){
         super(props);
-
-        this.state= {
-            currentView: <Issues/>
-        }
-
         autoBind(this);
     }
 
     render() { 
-        const {currentView} = this.state;
     let view=
     <div> 
         <Header />
@@ -68,8 +65,11 @@ export class OuterView extends React.Component {
 }
 
 export class Suppliers extends React.Component {
+    indivSupplier = null;
+
     constructor(props) {
         super(props);
+        autoBind(this);
 
         this.state = {
             suppliers: []
@@ -79,10 +79,12 @@ export class Suppliers extends React.Component {
     componentDidMount(){
         this.loadSuppliers();
     }
-
-    render() {
+ 
+    render(props) {
         const {suppliers} = this.state;
         let supplierSummaries = [];
+        let specificSupplier = this.props.match.params;
+        console.log("Specific props: ", specificSupplier);
 
         if (suppliers) {
             for (const supplier of suppliers) {
@@ -91,13 +93,25 @@ export class Suppliers extends React.Component {
         }
 
         return (
-            <div>
-                <button>Add</button>
-                <h1>Suppliers</h1>
-                <table>
-                    {supplierSummaries}
-                </table>
-            </div>
+            <Flexbox flexDirection="column">
+                <Flexbox element="header" flexDirection="row">
+                    <button onClick={this.addIndividualSupplier}>Add</button>
+                    <h1>Suppliers</h1>
+                </Flexbox>
+            
+                <Flexbox flexDirection="row" minHeight="300vh"> 
+                    <Flexbox flex={2}>
+                            <table>
+                                <tbody>
+                                {supplierSummaries}
+                                </tbody>
+                            </table>
+                    </Flexbox>
+                    <Flexbox flex={2}>
+                        <Supplier supplier={this.state.supplier}/>
+                    </Flexbox>
+                </Flexbox>
+            </Flexbox>
         );
     }
 
@@ -132,33 +146,49 @@ export class Suppliers extends React.Component {
             </tr>
         )
     }
+
+    addIndividualSupplier() {
+        this.indivSupplier = {Name: null, City: null, Reference: null};
+        this.setState({supplier: this.indivSupplier});
+    }
+
+    viewIndividualSupplier() {
+        console.log("Views individual supplier!");
+    }
 }
 
 function Supplier(props) {
-    return ( 
-            <div>
+
+    console.log("Supplier Props:", props);
+
+    if (props.supplier == null) {
+        return null;
+    } else {
+        return ( 
+            <card>
             <button className="supplier">
             Edit
             </button>                
                 <table>
                     <tr>
                         <td><b>Name</b></td>
-                        <td>{props.value.Name}</td>
+                        <td><Input type='text' label='Name' name='name' value={props.supplier.Name}/></td>
                     </tr>
                     <tr>
                         <td><b>City</b></td>
-                        <td>{props.value.City}</td>
+                        <td><Input type='text' label='City' name='city' value={props.supplier.City}/></td>
                     </tr>
                     <tr>
                         <td><b>Reference</b></td>
-                        <td>{props.value.Reference}</td>
-                </tr>
+                        <td><Input type='text' label='Reference' name='reference' value={props.supplier.Reference}/></td>
+                    </tr>
                 </table>
                 <button className="supplier" onClick={props.onClick}>
                 Ok
                 </button>
-            </div>  
+            </card>  
     );
+    }
 }
 
 function loadMockSuppliers() {
