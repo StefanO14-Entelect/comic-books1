@@ -151,7 +151,15 @@ export class Suppliers extends React.Component {
     }
 
     deleteIndividualSupplier(id) {
-        console.log("Deletes individual supplier! ID: ");
+        axios.delete(server+"/api/Suppliers/"+id)
+        .then(function(response){
+            console.log("Delete Response: ", response);
+            this.loadSuppliers();
+            return;
+        }.bind(this))
+        .catch(function(error){
+            console.log("Error: ", error);
+        })
     }
 
     viewIndividualSupplier(id) {
