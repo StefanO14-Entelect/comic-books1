@@ -107,7 +107,7 @@ export class Suppliers extends React.Component {
                             </table>
                     </Flexbox>
                     <Flexbox flex={2}>
-                        <Supplier supplier={this.state.selectedSupplier}/>
+                        <Supplier supplier={this.state.selectedSupplier} action={this.state.type} onChange={this.updateSupplier} onSubmit={this.submitSupplier}/>
                     </Flexbox>
                 </Flexbox>
             </Flexbox>
@@ -147,7 +147,15 @@ export class Suppliers extends React.Component {
     }
 
     addIndividualSupplier() {
+        this.setState({
+            type: "CREATE",
+            selectedSupplier: {id: null, name: null, city: null, reference: null}
+        })
         console.log("Selected Supplier in state: ", this.state.selectedSupplier)
+    }
+
+    editIndividualSupplier() {
+        console.log("Edits the supplier and sends updated version to the server.");
     }
 
     deleteIndividualSupplier(id) {
@@ -162,7 +170,32 @@ export class Suppliers extends React.Component {
         })
     }
 
+    submitNewSupplier() {
+        axios.post(server+"/api/Suppliers", {
+            id: this.state.selectedSupplier.id,
+            name: this.state.selectedSupplier.name,
+            city: this.state.selectedSupplier.city,
+            reference: this.state.selectedSupplier.reference
+        })
+        .then(function(response){
+            console.log("POST Response: ", response);
+        })
+    }
+
+    submitUpdateSupplier() {
+        axios.patch(server+"/api/Suppliers", {
+            id: this.state.selectedSupplier.id,
+            name: this.state.selectedSupplier.name,
+            city: this.state.selectedSupplier.city,
+            reference: this.state.selectedSupplier.reference
+        })
+        .then(function(response) {
+            console.log("Update response: ", response);
+        })
+    }
+
     viewIndividualSupplier(id) {
+
         axios.get(server+"/api/Suppliers/"+id)
         .then(function (response) {
             const id = response["data"]["id"];
@@ -176,7 +209,8 @@ export class Suppliers extends React.Component {
                     name: name,
                     city: city,
                     reference: reference
-                }
+                },
+                type: "EDIT"
             });
 
 
@@ -186,33 +220,83 @@ export class Suppliers extends React.Component {
             console.log("Error: ", error);
         })
     }
+
+    updateSupplier(supplier) {
+        this.setState({
+            selectedSupplier: {
+                id: supplier.id,
+                name: supplier.name,
+                city: supplier.city,
+                reference: supplier.reference
+            }
+        })
+    }
+
+    submitSupplier() {
+        if (this.state.type === "EDIT") {
+            console.log("Supplier to patch:", this.state.selectedSupplier);
+            this.submitUpdateSupplier();
+            
+        } else {
+            console.log("Supplier to post:", this.state.selectedSupplier);
+            this.submitNewSupplier();
+        }
+    }
+
+    closeIndividualSupplier() {
+        console.log("Selected supplier in state: ", this.state.selectedSupplier);
+    }
 }
 
 function Supplier(props) {
     if (props.supplier == null) {
         return null;
     } else {
+        let supplierHeader 
+        if (props.action === "CREATE"){
+            supplierHeader = "Creating new supplier:"
+        } else {
+            supplierHeader = "Editing supplier:"
+        }
+
         return ( 
             <card>
-            <button className="supplier">
-            Edit
-            </button>                
+            <CardTitle
+            title={supplierHeader}
+            />               
                 <table>
-                    <tr>
-                        <td><b>Name</b></td>
-                        <td><Input type='text' name='name' value={props.supplier.name}/></td>
-                    </tr>
-                    <tr>
-                        <td><b>City</b></td>
-                        <td><Input type='text' name='city' value={props.supplier.city}/></td>
-                    </tr>
-                    <tr>
-                        <td><b>Reference</b></td>
-                        <td><Input type='text' name='reference' value={props.supplier.reference}/></td>
-                    </tr>
+                    <tbody>
+                        <tr>
+                            <td><b>Name</b></td>
+                            <td><Input type='text' name='name' value={props.supplier.name} onChange={(value) => props.onChange({
+                                id: props.supplier.id,
+                                name: value,
+                                city: props.supplier.city,
+                                reference: props.reference
+                            })}/></td>
+                        </tr>
+                        <tr>
+                            <td><b>City</b></td>
+                            <td><Input type='text' name='city' value={props.supplier.city} onChange={(value) => props.onChange({
+                                id: props.supplier.id,
+                                name: props.supplier.name,
+                                city: value,
+                                reference: props.reference
+                            })} /></td>
+                        </tr>
+                        <tr>
+                            <td><b>Reference</b></td>
+                            <td><Input type='text' name='reference' value={props.supplier.reference} onChange={(value) => props.onChange({
+                                id: props.supplier.id,
+                                name: props.supplier.name,
+                                city: props.supplier.city,
+                                reference: value
+                            })}/></td>
+                        </tr>
+                    </tbody>
                 </table>
-                <button className="supplier" onClick={props.onClick}>
-                Ok
+                <button className="supplier" onClick={() => props.onSubmit()}>
+                Submit
                 </button>
             </card>  
     );
