@@ -13,8 +13,6 @@ import {OuterView} from './OuterView';
 import {Suppliers} from './Suppliers';
 import {Issues} from './Issues';
 
-export const server="http://frontendshowcase.azurewebsites.net:80";
-
 export const Header = () => (
     <header>
         <nav>

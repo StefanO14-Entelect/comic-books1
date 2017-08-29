@@ -1,13 +1,11 @@
 import axios from 'axios';
 
 export const server="http://frontendshowcase.azurewebsites.net:80";
-
-export class ApiService {
     
-    export getAll(resourceType) {
+export function getAll(resourceType) {
         axios.get(server+"/api/"+resourceType)
         .then(function(response){
-            const resourses = response.data;
+            const resources = response.data;
             return resources;
         }.bind(this))
         .catch(function(error){
@@ -16,8 +14,8 @@ export class ApiService {
         })
     }
 
-    export getOne(resourceType, id) {
-        axios.get(server+"/api/Suppliers/"+id)
+export function getOne(resourceType, id) {
+        axios.get(server+"/api/"+resourceType+"/"+id)
         .then(function(response) {
             var resource = response.data;
             return resource;
@@ -28,7 +26,7 @@ export class ApiService {
         })
     }
 
-    export Create(resourceType, value) {
+export function Create(resourceType, value) {
         axios.post(server+"/api/"+resourceType, value)
         .then(function(response){
             console.log("POST Response: ". response);
@@ -36,14 +34,14 @@ export class ApiService {
         )
     }
 
-    export Update(resourceType, value) {
+export function Update(resourceType, value) {
         axios.put(server+"/api/"+resourceType, value)
         .then(function(response) {
             console.log("Update Response: ", response);
         })
     }
 
-    export Delete(resourceType, id) {
+export function Delete(resourceType, id) {
         axios.delete(server+"/api/"+resourceType+"/"+id)
         .then(function(response){
             console.log("Delete Response: ", response);
@@ -53,4 +51,3 @@ export class ApiService {
             console.log("Error:", error);
         })
     }
-}

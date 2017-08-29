@@ -1,4 +1,4 @@
-import {server} from "./index";
+import {server} from "./Services/ApiService";
 import React from 'react';
 import Input from 'react-toolbox/lib/input';
 import Card from 'react-toolbox/lib/card/Card';
@@ -7,6 +7,7 @@ import Button from 'react-toolbox/lib/button/Button';
 import Flexbox from 'flexbox-react';
 import autoBind from 'react-autobind';
 import axios from 'axios';
+import {getAll, getOne, Create, Update, Delete} from './Services/ApiService';
 
 export class Suppliers extends React.Component {
     constructor(props) {
