@@ -148,10 +148,10 @@ export class Suppliers extends React.Component {
             
             this.setState({
                 selectedSupplier: {
-                    id: id,
-                    name: name,
-                    city: city,
-                    reference: reference
+                    id,
+                    name,
+                    city,
+                    reference
                 },
                 type: "EDIT"
             });
@@ -166,12 +166,7 @@ export class Suppliers extends React.Component {
 
     updateSupplier(supplier) {
         this.setState({
-            selectedSupplier: {
-                id: supplier.id,
-                name: supplier.name,
-                city: supplier.city,
-                reference: supplier.reference
-            }
+            selectedSupplier: supplier
         })
     }
 
