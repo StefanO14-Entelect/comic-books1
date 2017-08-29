@@ -183,7 +183,7 @@ export class Suppliers extends React.Component {
     }
 
     submitUpdateSupplier() {
-        axios.patch(server+"/api/Suppliers", {
+        axios.put(server+"/api/Suppliers", {
             id: this.state.selectedSupplier.id,
             name: this.state.selectedSupplier.name,
             city: this.state.selectedSupplier.city,
