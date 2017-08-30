@@ -58,14 +58,18 @@ export class Issues extends React.Component{
         
             <Flexbox flexDirection="row" minHeight="300vh"> 
                 <Flexbox flex={2}>
+                    <card>
                         <table>
                             <tbody>
                             {issueSummaries}
                             </tbody>
                         </table>
+                    </card>
                 </Flexbox>
                 <Flexbox flex={2}>
-                    <Issue issue={this.state.selectedIssue}/>
+                    <card>
+                        <Issue issue={this.state.selectedIssue}/>
+                    </card>
                 </Flexbox>
             </Flexbox>
         </Flexbox>
@@ -111,61 +115,74 @@ export class Issues extends React.Component{
 }
 
 function Issue(props) {
+    console.log("Props Issue: ", props.issue);
+
     if (props.issue == null) {
         return null;
     } else {
+        let image = null;
+        if ((props.issue.images != null) && (props.issue.images.length > 0)) {
+            image = <img src={props.issue.images[0].pathIncludingExtension} alt={props.issue.title} height="100px" width="50px"/>
+        }
+
         return (
             <div>
-                <div>
-                    <img src={props.issue.images.path} alt={props.issue.title} height="100px" width="50px"/>
+                <Flexbox flexDirection="column">
+                        <Flexbox flexDirection="row">
+                            <div>
+                                {image}
+                            </div>
+                            <div>
+                                <div>
+                                    <table>
+                                        <tbody>
+                                        <tr>
+                                            <td>
+                                                <b>Title</b>                
+                                            </td>
+                                            <td>
+                                                {props.issue.title}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <b>Publication Date</b>
+                                            </td>
+                                            <td>
+                                                {props.issue.publicationDate}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <b>Publisher</b>
+                                            </td>
+                                            <td>
+                                                {props.issue.publisher}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <b>Description</b>
+                                            </td>
+                                            <td>
+                                                {props.issue.description}
+                                            </td>            
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </Flexbox>
+                    </Flexbox>
+                    <Flexbox flexDirection="row">
+                        <button className="supplier">
+                        Back
+                        </button>
+                        <button className="supplier">
+                        Order
+                        </button>
+                    </Flexbox>
                 </div>
-                <div>
-                    <table>
-                        <tbody>
-                        <tr>
-                            <td>
-                                <b>Title</b>                
-                            </td>
-                            <td>
-                                {props.issue.title}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <b>Publication Date</b>
-                            </td>
-                            <td>
-                                {props.issue.publicationDate}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <b>Publisher</b>
-                            </td>
-                            <td>
-                                {props.issue.publisher}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <b>Description</b>
-                            </td>
-                            <td>
-                                {props.issue.description}
-                            </td>            
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div>
-                    <button className="supplier">
-                    Back
-                    </button>
-                    <button className="supplier">
-                    Order
-                    </button>
-                </div>
-            </div>
             );
     }
 }
