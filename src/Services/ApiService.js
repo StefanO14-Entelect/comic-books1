@@ -3,27 +3,11 @@ import axios from 'axios';
 export const server="http://frontendshowcase.azurewebsites.net:80";
     
 export function getAll(resourceType) {
-        axios.get(server+"/api/"+resourceType)
-        .then(function(response){
-            const resources = response.data;
-            return resources;
-        }.bind(this))
-        .catch(function(error){
-            console.log("Error:", error);
-            return null;
-        })
+        return axios.get(server+"/api/"+resourceType)
     }
 
 export function getOne(resourceType, id) {
-        axios.get(server+"/api/"+resourceType+"/"+id)
-        .then(function(response) {
-            var resource = response.data;
-            return resource;
-        }.bind(this))
-        .catch(function(error) {
-            console.log("Error: ", error);
-            return null;
-        })
+        return axios.get(server+"/api/"+resourceType+"/"+id)
     }
 
 export function Create(resourceType, value) {

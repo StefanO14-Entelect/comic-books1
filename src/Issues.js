@@ -4,14 +4,20 @@ import axios from 'axios';
 import Button from 'react-toolbox/lib/button/Button';
 import Card from 'react-toolbox/lib/card/Card';
 import CardTitle from 'react-toolbox/lib/card/CardTitle';
+import Flexbox from 'flexbox-react';
 import {getAll, getOne, Create, Update, Delete} from './Services/ApiService';
 
+const resourceType= "Issues";
+
 export class Issues extends React.Component{
+    
     constructor(props) {
         super(props);
 
         this.state = {
-            issues: []
+            issues: [],
+            selectedIssue: null,
+            resource: null
         }
     }
 
@@ -20,9 +26,9 @@ export class Issues extends React.Component{
     }
 
     loadIssues() {
-        axios.get(server+"/api/Issues")
+        getAll(resourceType)
         .then(function(response){
-            const issuesIN= response["data"];
+            const issuesIN= response.data;
             
             this.setState({
                 issues: issuesIN
@@ -31,6 +37,7 @@ export class Issues extends React.Component{
         }.bind(this))
         .catch(function(error){
             console.log("Error:", error);
+            return;
         })
     }  
 
@@ -43,15 +50,25 @@ export class Issues extends React.Component{
         }
     
         return (
-            <Card style={{width: '750px'}} fxFlex="auto">
-                <CardTitle title="Issues"/>
-                <Button label="Add"/>
-                <table>
-                    <tbody>
-                    {issueSummaries}
-                    </tbody>
-                </table>
-            </Card>
+            <Flexbox flexDirection="column">
+            <Flexbox element="header" flexDirection="row">
+                <button onClick={this.addIndividualSupplier}>Add</button>
+                <h1>Issues</h1>
+            </Flexbox>
+        
+            <Flexbox flexDirection="row" minHeight="300vh"> 
+                <Flexbox flex={2}>
+                        <table>
+                            <tbody>
+                            {issueSummaries}
+                            </tbody>
+                        </table>
+                </Flexbox>
+                <Flexbox flex={2}>
+                    <Issue issue={this.state.selectedIssue}/>
+                </Flexbox>
+            </Flexbox>
+        </Flexbox>
         );
     }
 
@@ -73,15 +90,19 @@ export class Issues extends React.Component{
     }
 
     loadIssue(id) {
-        var issue= getOne("Issues", id);
-        console.log("Issue OUT:", issue);
-        /*.then(function(issue){
-            console.log("Issue OUT:", issue);
+        getOne(resourceType, id)
+        .then(function(response) {
+            this.setState({
+                selectedIssue: response.data
+            })
+
+            console.log("Selected Issue:", this.state.selectedIssue)
             return;
         }.bind(this))
-        .catch(function(error){
-            console.log("Error:", error);
-        })*/
+        .catch(function(error) {
+            console.log("Error: ", error);
+            return null;
+        })
     }
 
     deleteIssue(id) {
@@ -90,57 +111,61 @@ export class Issues extends React.Component{
 }
 
 function Issue(props) {
-    return (
-    <div>
-        <div>
-            <img src={props.value.images.path} alt={props.value.title} height="100px" width="50px"/>
-        </div>
-        <div>
-            <table>
-                <tbody>
-                <tr>
-                    <td>
-                        <b>Title</b>                
-                    </td>
-                    <td>
-                        {props.value.title}
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <b>Publication Date</b>
-                    </td>
-                    <td>
-                        {props.value.publicationDate}
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <b>Publisher</b>
-                    </td>
-                    <td>
-                        {props.value.publisher}
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <b>Description</b>
-                    </td>
-                    <td>
-                        {props.value.description}
-                    </td>            
-                </tr>
-                </tbody>
-            </table>
-        </div>
-        <div>
-            <button className="supplier">
-            Back
-            </button>
-            <button className="supplier">
-            Order
-            </button>
-        </div>
-    </div>
-    );
+    if (props.issue == null) {
+        return null;
+    } else {
+        return (
+            <div>
+                <div>
+                    <img src={props.issue.images.path} alt={props.issue.title} height="100px" width="50px"/>
+                </div>
+                <div>
+                    <table>
+                        <tbody>
+                        <tr>
+                            <td>
+                                <b>Title</b>                
+                            </td>
+                            <td>
+                                {props.issue.title}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <b>Publication Date</b>
+                            </td>
+                            <td>
+                                {props.issue.publicationDate}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <b>Publisher</b>
+                            </td>
+                            <td>
+                                {props.issue.publisher}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <b>Description</b>
+                            </td>
+                            <td>
+                                {props.issue.description}
+                            </td>            
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    <button className="supplier">
+                    Back
+                    </button>
+                    <button className="supplier">
+                    Order
+                    </button>
+                </div>
+            </div>
+            );
+    }
 }
